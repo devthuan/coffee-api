@@ -1,6 +1,8 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
+// mysql on ubuntu
+
 const connection = mysql.createConnection({
   host: process.env.DB__HOST,
   user: process.env.DB__USER,
@@ -16,6 +18,5 @@ connection.connect((err) => {
   }
   console.log("Connected to MYSQL as id: " + connection.threadId);
 });
-
 
 module.exports = { connection };

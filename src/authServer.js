@@ -3,12 +3,12 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
-const useRoutes = require("./api/v1/routes/api.route");
+const useRoutes = require("./api/v1/routes/auth.route");
 
 const app = express();
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const port = 5050;
 
 // phân tích dữ liệu từ body : lấy req từ form
 app.use(express.json());
