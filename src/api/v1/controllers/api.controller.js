@@ -173,10 +173,214 @@ const refreshLogin = (req, res, next) => {
   }
 };
 
+const Products = (req, res, next) => {
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 2;
+  const offset = (page - 1) * limit;
+
+  let sql = "select * from Products limit ?, ?";
+  connection.query(sql, [offset, limit], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      connection.query(
+        "select count(*) as total from Products ",
+        (error, resultTotal) => {
+          if (error) {
+            console.log(error);
+            res.status(500).json({
+              error: "An Unknown error.",
+            });
+          } else {
+            const total = resultTotal[0].total;
+            const totalPages = Math.ceil(total / limit);
+            res.status(200).json({
+              message: "Get products successful.",
+              total,
+              totalPages,
+              products: result,
+            });
+          }
+        }
+      );
+    }
+  });
+};
+
+const GetUsers = (req, res, next) => {
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 5;
+  const offset = (page - 1) * limit;
+
+  let sql = "select * from Users limit ?, ?";
+  connection.query(sql, [offset, limit], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      connection.query(
+        "select count(*) as total from Users",
+        (totalError, totalResult) => {
+          if (totalError) {
+            console.log(totalError);
+            res.status(500).json({ error: "An Unknown error ." });
+          } else {
+            let total = totalResult[0].total;
+            let totalPages = Math.ceil(total / limit);
+            res.status(200).json({
+              message: "Get users successful .",
+              total,
+              totalPages,
+              data: result,
+            });
+          }
+        }
+      );
+    }
+  });
+};
+
+// const DeleteUsers = (req, res, next) => {
+//   const { id } = req.params;
+
+//   let sql = "delete from Users where id = ?";
+//   connection.query(sql, [id], (error, result) => {
+//     if (error) {
+//       console.log(error);
+//       res.status(500).json({
+//         error: "An Unknown error.",
+//       });
+//       return;
+//     } else {
+//       res.status(200).json({
+//         message: "Delete user successful.",
+//       });
+//     }
+//   });
+// };
+
+const GetCart = (req, res, next) => {
+  const user_id = req.user_id;
+  // const { user_id, product_id, quantity } = req.body;
+
+  // if (!user_id || !product_id || !quantity) {
+  //   return res.status(400).json({
+  //     error: "Missing values.",
+  //   });
+  // }
+
+  let sql = `SELECT user_id, product_id, name_product, price, quantity FROM Cart 
+          JOIN Products ON Cart.product_id = Products.id where user_id = ?`;
+
+  connection.query(sql, [user_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        data: result,
+      });
+    }
+  });
+};
+const AddCart = (req, res, next) => {
+  const user_id = req.user_id;
+  const { product_id, quantity } = req.body;
+
+  if (!product_id || !quantity) {
+    return res.status(400).json({
+      error: "Missing values.",
+    });
+  }
+
+  let sql = `Insert into Cart (user_id, product_id, quantity) values (?,?,?)`;
+
+  connection.query(sql, [user_id, product_id, quantity], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        message: "Add item to cart successful.",
+      });
+    }
+  });
+};
+const DeleteCart = (req, res, next) => {
+  const { cart_id } = req.params;
+  if (!cart_id) {
+    return res.status(400).json({
+      error: "Missing values.",
+    });
+  }
+
+  let sql = `delete from Cart where cart_id = ?`;
+
+  connection.query(sql, [cart_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        message: "delete item in cart successful.",
+      });
+    }
+  });
+};
+const UpdateCart = (req, res, next) => {
+  const { cart_id } = req.params;
+  const { quantity } = req.body;
+  if (!cart_id) {
+    return res.status(400).json({
+      error: "Missing values.",
+    });
+  }
+
+  let sql = `update Cart set quantity = ? where cart_id = ?`;
+
+  connection.query(sql, [quantity, cart_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        message: "update quantity item in cart successful.",
+      });
+    }
+  });
+};
+
+// sql table orders
+// let sql = `SELECT order_id, name_product, price, quantity, full_name, phone_number, address,order_status, order_date FROM Orders
+// JOIN Cart ON Orders.cart_id = Cart.cart_id
+// JOIN Products ON Cart.product_id = Products.id
+// WHERE Orders.user_id = 40
+// `;
+
 module.exports = {
   HomePages,
   Register,
   Login,
   Logout,
   refreshLogin,
+  Products,
+  GetUsers,
+
+  GetCart,
+  AddCart,
+  DeleteCart,
+  UpdateCart,
 };

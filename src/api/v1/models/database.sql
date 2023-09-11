@@ -19,12 +19,19 @@ CREATE TABLE Products (
 
 -- Tạo bảng Đơn hàng
 CREATE TABLE Orders (
-    order_id INT PRIMARY KEY  AUTO_INCREMENT,
-    user_id INT,
-    order_date DATETIME,
-    order_status VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES Users(id)
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    cart_id int not null,
+    full_name VARCHAR(100) not null,
+    phone_number VARCHAR(10) not null,
+    order_date DATETIME NOT NULL,
+    order_status VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(id), -- Nếu có bảng Users
+    FOREIGN KEY (product_id) REFERENCES Products(id) -- Nếu có bảng Products
+    FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) -- Nếu có bảng Products
 );
+
 
 -- Tạo bảng Chi tiết đơn hàng
 CREATE TABLE OrderDetails (
@@ -75,6 +82,7 @@ CREATE TABLE Tokens (
 
 
 
+
 -- Thêm dữ liệu vào bảng Users
 INSERT INTO Users (id, username, password, phone_number, is_staff, created_date)
 VALUES
@@ -85,22 +93,21 @@ VALUES
     (5, 'user5', 'password5', 9999999999, 'staff5', '2023-09-08');
 
 -- Thêm dữ liệu vào bảng Products
-INSERT INTO Products (id, name_product, description, price, created_date)
+INSERT INTO Orders (user_id, cart_id, full_name, phone_number, address, order_date, order_status)
 VALUES
-    (1, 'Product1', 'Description1', 10.99, '2023-09-08'),
-    (2, 'Product2', 'Description2', 15.49, '2023-09-08'),
-    (3, 'Product3', 'Description3', 5.99, '2023-09-08'),
-    (4, 'Product4', 'Description4', 7.89, '2023-09-08'),
-    (5, 'Product5', 'Description5', 12.99, '2023-09-08');
+    (1, 1, 'Nguyễn Văn A', '1234567890', 'Địa chỉ A', '2023-09-11 10:00:00', 'Đang xử lý'),
+    (2, 2, 'Trần Thị B', '0987654321', 'Địa chỉ B', '2023-09-11 11:30:00', 'Hoàn thành'),
+    (3, 3, 'Lê Văn C', '0123456789', 'Địa chỉ C', '2023-09-11 12:45:00', 'Chờ giao hàng'),
+    (1, 4, 'Phạm Thị D', '0987654321', 'Địa chỉ D', '2023-09-11 14:15:00', 'Đã giao hàng'),
+    (4, 5, 'Trương Văn E', '1234567890', 'Địa chỉ E', '2023-09-11 15:30:00', 'Chờ xác nhận');
 
 -- Thêm dữ liệu vào bảng Orders
-INSERT INTO Orders (order_id, user_id, order_date, order_status)
-VALUES
-    (1, 1, '2023-09-08', 'Confirmed'),
-    (2, 2, '2023-09-08', 'Processing'),
-    (3, 3, '2023-09-08', 'Shipped'),
-    (4, 4, '2023-09-08', 'Delivered'),
-    (5, 5, '2023-09-08', 'Cancelled');
+-- Chèn hàng đầu tiên
+INSERT INTO Orders (user_id, product_id, cart_id, full_name, phone_number, order_date, order_status)
+VALUES (1, 1, 1, 'Nguyễn Văn A', '1234567890', NOW(), 'Đang xử lý');
+        (2, 2, 2, 'Trần Thị B', '0987654321', NOW(), 'Hoàn thành'),
+        (3, 3, 3, 'Lê Văn C', '0123456789', NOW(), 'Chờ giao hàng');
+
 
 -- Thêm dữ liệu vào bảng OrderDetails
 INSERT INTO OrderDetails (id, order_id, product_id, quantity, price)

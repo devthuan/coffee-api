@@ -18,7 +18,6 @@ const verifyToken = (req, res, next) => {
 
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(decoded);
     req.user_id = decoded.user_id;
     next();
   } catch (error) {
@@ -82,8 +81,6 @@ const generateTokens = (payload) => {
 
   return { accessToken, refreshToken };
 };
-
-const deleteToken = (req, res, next) => {};
 
 module.exports = {
   verifyToken,
