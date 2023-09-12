@@ -266,13 +266,6 @@ const GetUsers = (req, res, next) => {
 
 const GetCart = (req, res, next) => {
   const user_id = req.user_id;
-  // const { user_id, product_id, quantity } = req.body;
-
-  // if (!user_id || !product_id || !quantity) {
-  //   return res.status(400).json({
-  //     error: "Missing values.",
-  //   });
-  // }
 
   let sql = `SELECT user_id, product_id, name_product, price, quantity FROM Cart 
           JOIN Products ON Cart.product_id = Products.id where user_id = ?`;
@@ -363,12 +356,66 @@ const UpdateCart = (req, res, next) => {
   });
 };
 
-// sql table orders
-// let sql = `SELECT order_id, name_product, price, quantity, full_name, phone_number, address,order_status, order_date FROM Orders
-// JOIN Cart ON Orders.cart_id = Cart.cart_id
-// JOIN Products ON Cart.product_id = Products.id
-// WHERE Orders.user_id = 40
-// `;
+
+const GetOrderByUser = (req, res, next) => {
+  const user_id = req.user_id;
+
+  let sql = `SELECT order_id, name_product, price, quantity, full_name, phone_number, address,order_status, order_date FROM Orders
+  JOIN Cart ON Orders.cart_id = Cart.cart_id
+  JOIN Products ON Cart.product_id = Products.id
+  WHERE Orders.user_id = ?
+  `;
+  connection.query(sql, [user_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error. ",
+      });
+    } else {
+      res.status(200).json({
+        data: result,
+      });
+    }
+  });
+};
+const GetOrderAll = (req, res, next) => {
+  const page = req.params.page || 1;
+  const limit = req.params.limit || 5;
+  const offset = (page - 1) * limit;
+
+  let sql = `SELECT order_id, name_product, price, quantity, full_name, phone_number, address,order_status, order_date FROM Orders
+  JOIN Cart ON Orders.cart_id = Cart.cart_id
+  JOIN Products ON Cart.product_id = Products.id
+  limit ? , ? `;
+  connection.query(sql, [offset, limit], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error. ",
+      });
+    } else {
+      connection.query(
+        "select  count(*) as total from Orders",
+        (totalError, totalResult) => {
+          if (totalError) {
+            console.log(totalError);
+            res.status(400).json({
+              error: "An Unknown error.",
+            });
+          } else {
+            const total = totalResult[0].total;
+            const totalPages = Math.ceil(total / limit);
+            res.status(200).json({
+              total,
+              totalPages,
+              data: result,
+            });
+          }
+        }
+      );
+    }
+  });
+};
 
 module.exports = {
   HomePages,
@@ -383,4 +430,7 @@ module.exports = {
   AddCart,
   DeleteCart,
   UpdateCart,
+
+  GetOrderByUser,
+  GetOrderAll,
 };

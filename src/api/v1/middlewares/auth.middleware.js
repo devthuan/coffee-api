@@ -72,11 +72,11 @@ const updateRefreshToken = (user_id, refreshToken) => {
 const generateTokens = (payload) => {
   // Create JWT
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "60s",
+    expiresIn: "1h",
   });
 
   const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "1d",
   });
 
   return { accessToken, refreshToken };

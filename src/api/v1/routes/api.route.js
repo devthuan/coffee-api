@@ -14,4 +14,7 @@ route.post("/cart", verifyToken, apiController.AddCart);
 route.delete("/cart/:cart_id", apiController.DeleteCart);
 route.patch("/cart/:cart_id", apiController.UpdateCart);
 
+route.get("/order", verifyToken, apiController.GetOrderByUser);
+route.get("/order-all", verifyToken, apiController.GetOrderAll);
+
 module.exports = route;
