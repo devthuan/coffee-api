@@ -1,6 +1,9 @@
 const express = require("express");
 const apiController = require("../controllers/api.controller");
-const { verifyToken } = require("../middlewares/auth.middleware");
+const {
+  verifyToken,
+  projectRouteAdmin,
+} = require("../middlewares/auth.middleware");
 const route = express.Router();
 
 // route.get("/users", verifyToken, apiController.HomePages);
@@ -15,6 +18,9 @@ route.delete("/cart/:cart_id", apiController.DeleteCart);
 route.patch("/cart/:cart_id", apiController.UpdateCart);
 
 route.get("/order", verifyToken, apiController.GetOrderByUser);
-route.get("/order-all", verifyToken, apiController.GetOrderAll);
+route.get("/order-all", projectRouteAdmin, apiController.GetOrderAll);
+
+route.get("/search", apiController.SearchUser);
+route.post("/total-sales", apiController.AddTotalSales);
 
 module.exports = route;

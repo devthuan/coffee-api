@@ -28,6 +28,48 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+const projectRouteAdmin = (req, res, next) => {
+  const authHeader = req.header("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token)
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+
+  try {
+    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    let user_id = decoded.user_id;
+    console.log(user_id);
+    connection.query(
+      "select is_staff from Users where id = ?",
+      [user_id],
+      (error, result) => {
+        if (error) {
+          console.log(error);
+          res.status(500).json({
+            error: "An Unknown error.",
+          });
+          return;
+        } else {
+          if (result[0].is_staff === "true") {
+            next();
+          } else {
+            res.status(403).json({
+              message: "You do not have permission to access this route",
+            });
+          }
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({
+      error: "Forbidden",
+    });
+  }
+};
+
 const updateRefreshToken = (user_id, refreshToken) => {
   connection.query(
     "SELECT user_id, refresh_token FROM Tokens WHERE user_id = ?",
@@ -86,4 +128,5 @@ module.exports = {
   verifyToken,
   generateTokens,
   updateRefreshToken,
+  projectRouteAdmin,
 };

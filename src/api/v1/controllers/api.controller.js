@@ -356,7 +356,6 @@ const UpdateCart = (req, res, next) => {
   });
 };
 
-
 const GetOrderByUser = (req, res, next) => {
   const user_id = req.user_id;
 
@@ -417,6 +416,68 @@ const GetOrderAll = (req, res, next) => {
   });
 };
 
+const SearchUser = (req, res, next) => {
+  const searchTerm = req.query.key;
+
+  const sql =
+    "select * from Users where username like ? or phone_number like ?";
+  const query = [`${searchTerm}%`, `%${searchTerm}%`];
+
+  connection.query(sql, query, (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      res.status(200).json({
+        data: result,
+      });
+    }
+  });
+};
+
+const AddTotalSales = (req, res, next) => {
+  const sql = `SELECT  SUM(Products.price * Cart.quantity) AS total_sales, Orders.order_date AS date
+                FROM Orders
+                JOIN Cart ON Orders.cart_id = Cart.cart_id
+                JOIN Products ON Cart.product_id = Products.id
+                WHERE Orders.order_status = "Hoàn thành"
+                GROUP BY Orders.order_date;
+                `;
+  connection.query(sql, (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      result.forEach((row) => {
+        const date = row.date;
+        const total_sales = row.total_sales;
+        connection.query(
+          `INSERT INTO Sales (sale_date, total_sales) VALUES (?,?)
+            ON DUPLICATE KEY UPDATE total_sales = VALUES(total_sales);
+          `,
+          [date, total_sales],
+          (AddError, AddResult) => {
+            if (AddError) {
+              console.log(AddError);
+              res.status(500).json({
+                error: "An Unknown error.",
+              });
+            } else {
+              res.status(200).json({
+                message: "Insert data to table sales successful.",
+              });
+            }
+          }
+        );
+      });
+    }
+  });
+};
+
 module.exports = {
   HomePages,
   Register,
@@ -433,4 +494,7 @@ module.exports = {
 
   GetOrderByUser,
   GetOrderAll,
+
+  SearchUser,
+  AddTotalSales,
 };
