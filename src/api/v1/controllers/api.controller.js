@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const { connection } = require("../../../config/index.config");
 const { validateRegisterData } = require("../validations/index.validation");
@@ -177,6 +178,7 @@ const Products = (req, res, next) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 2;
   const offset = (page - 1) * limit;
+  const serverUrl = "http://localhost:8080/uploads/"; // Địa chỉ máy chủ của bạn
 
   let sql = "select * from Products limit ?, ?";
   connection.query(sql, [offset, limit], (error, result) => {
@@ -478,6 +480,78 @@ const AddTotalSales = (req, res, next) => {
   });
 };
 
+const UpdateStatusOrder = (req, res, next) => {
+  const { order_id, order_status } = req.body;
+  if (!order_id || !order_status) {
+    res.status(400).json({
+      error: "Missing values !!!",
+    });
+    return;
+  }
+  let sql = `UPDATE Orders SET order_status = ? WHERE order_id = ?`;
+  connection.query(sql, [order_status, order_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      res.status(200).json({
+        message: "Update status order successful.",
+      });
+    }
+  });
+};
+
+const UploadFile = (req, res, next) => {
+  const id = req.body.id;
+
+  const file = req.file;
+  const serverUrl = "http://localhost:8080/uploads/"; // Địa chỉ máy chủ của bạn
+
+  const pathFile = serverUrl + file.filename;
+
+  if (!id || !file) {
+    res.status(400).json({
+      error: "Missing values !!!",
+    });
+    return;
+  }
+  let sql = `UPDATE Products SET image_product = ? WHERE id = ?`;
+  connection.query(sql, [pathFile, id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      res.status(200).json({
+        message: "Update status image product successful.",
+      });
+    }
+  });
+};
+
+const GetFile = (req, res, next) => {
+  let sql = `select image_product from Products limit 1`;
+  connection.query(sql, (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      const imagePaths = result.map((row) => {
+        return row.image_product;
+      });
+
+      res.status(200).json({
+        data: imagePaths,
+      });
+    }
+  });
+};
+
 module.exports = {
   HomePages,
   Register,
@@ -497,4 +571,9 @@ module.exports = {
 
   SearchUser,
   AddTotalSales,
+
+  UpdateStatusOrder,
+
+  UploadFile,
+  GetFile,
 };

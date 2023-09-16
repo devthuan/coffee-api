@@ -40,7 +40,6 @@ const projectRouteAdmin = (req, res, next) => {
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     let user_id = decoded.user_id;
-    console.log(user_id);
     connection.query(
       "select is_staff from Users where id = ?",
       [user_id],

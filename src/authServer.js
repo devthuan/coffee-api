@@ -2,13 +2,18 @@ const express = require("express");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
-
+const cors = require("cors");
 const useRoutes = require("./api/v1/routes/auth.route");
 
 const app = express();
 dotenv.config();
 
 const port = 5050;
+app.use(
+  cors({
+    origin: `http://localhost:3000`,
+  })
+);
 
 // phân tích dữ liệu từ body : lấy req từ form
 app.use(express.json());

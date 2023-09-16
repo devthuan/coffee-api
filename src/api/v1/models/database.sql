@@ -12,6 +12,7 @@ CREATE TABLE Users (
 CREATE TABLE Products (
     id INT PRIMARY KEY  AUTO_INCREMENT,
     name_product VARCHAR(255) NOT NULL,
+    image_product BLOB,
     description VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
     created_date DATETIME
@@ -33,16 +34,7 @@ CREATE TABLE Orders (
 );
 
 
--- Tạo bảng Chi tiết đơn hàng
-CREATE TABLE OrderDetails (
-    id INT PRIMARY KEY  AUTO_INCREMENT,
-    order_id INT,
-    product_id INT,
-    quantity INT,
-    price DECIMAL(10, 2),
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES Products(id)
-);
+
 
 -- Tạo bảng Giỏ hàng
 CREATE TABLE Cart (
