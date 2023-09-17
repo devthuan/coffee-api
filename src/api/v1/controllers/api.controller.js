@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const path = require("path");
 
 const { connection } = require("../../../config/index.config");
 const { validateRegisterData } = require("../validations/index.validation");
@@ -95,7 +94,8 @@ const Login = (req, res, next) => {
       });
     }
 
-    let sql = "select id, username, password from Users where username = ?";
+    let sql =
+      "select id, username, password, is_active from Users where username = ?";
     connection.query(sql, [username], async (error, result, fields) => {
       if (error) {
         res.status(400).json({
@@ -113,6 +113,11 @@ const Login = (req, res, next) => {
         if (!comparePass) {
           return res.status(404).json({
             error: "Account or password is incorrect.",
+          });
+        }
+        if (result[0].is_active === 0) {
+          return res.status(400).json({
+            error: "Your account has been locked",
           });
         }
 
@@ -211,6 +216,54 @@ const Products = (req, res, next) => {
     }
   });
 };
+const AddProducts = (req, res, next) => {
+  const { name_product, description, price } = req.body;
+  const image_product = req.file;
+  const serverUrl = "http://localhost:8080/uploads/";
+  const pathFile = serverUrl + image_product.filename;
+
+  let sql = `insert into Products (name_product, description, price, created_date, image_product) values (?, ?, ?, NOW(), ?)`;
+  connection.query(
+    sql,
+    [name_product, description, price, pathFile],
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        res.status(500).json({
+          error: "An Unknown error.",
+        });
+      } else {
+        res.status(200).json({
+          message: "Add product successful .",
+        });
+      }
+    }
+  );
+};
+const DeleteProducts = (req, res, next) => {
+  const { product_id } = req.params;
+
+  if (!product_id) {
+    return res.status(400).json({
+      error: "Missing values.",
+    });
+  }
+
+  let sql = `update Products set is_active = ? where id = ?`;
+
+  connection.query(sql, [0, product_id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        message: "delete item in cart successful.",
+      });
+    }
+  });
+};
 
 const GetUsers = (req, res, next) => {
   const page = req.query.page || 1;
@@ -247,24 +300,24 @@ const GetUsers = (req, res, next) => {
   });
 };
 
-// const DeleteUsers = (req, res, next) => {
-//   const { id } = req.params;
+const DeleteUsers = (req, res, next) => {
+  const { id } = req.params;
 
-//   let sql = "delete from Users where id = ?";
-//   connection.query(sql, [id], (error, result) => {
-//     if (error) {
-//       console.log(error);
-//       res.status(500).json({
-//         error: "An Unknown error.",
-//       });
-//       return;
-//     } else {
-//       res.status(200).json({
-//         message: "Delete user successful.",
-//       });
-//     }
-//   });
-// };
+  let sql = "update Users set is_active = ? where id = ?";
+  connection.query(sql, [0, id], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+      return;
+    } else {
+      res.status(200).json({
+        message: "Delete user successful.",
+      });
+    }
+  });
+};
 
 const GetCart = (req, res, next) => {
   const user_id = req.user_id;
@@ -554,12 +607,18 @@ const GetFile = (req, res, next) => {
 
 module.exports = {
   HomePages,
-  Register,
+
+  refreshLogin,
   Login,
   Logout,
-  refreshLogin,
-  Products,
+
+  Register,
   GetUsers,
+  DeleteUsers,
+
+  Products,
+  AddProducts,
+  DeleteProducts,
 
   GetCart,
   AddCart,
