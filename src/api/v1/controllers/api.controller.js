@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const { connection } = require("../../../config/index.config");
+const { connection } = require("../../../config/mysql.config");
 const { validateRegisterData } = require("../validations/index.validation");
 const { GetDateTimeCurrent } = require("../helpers/index.helper");
 const { hashPassword, comparePassword } = require("../services/auth.service");
@@ -181,9 +181,8 @@ const refreshLogin = (req, res, next) => {
 
 const Products = (req, res, next) => {
   const page = req.query.page || 1;
-  const limit = req.query.limit || 2;
+  const limit = req.query.limit || 5;
   const offset = (page - 1) * limit;
-  const serverUrl = "http://localhost:8080/uploads/"; // Địa chỉ máy chủ của bạn
 
   let sql = "select * from Products limit ?, ?";
   connection.query(sql, [offset, limit], (error, result) => {
@@ -432,6 +431,7 @@ const GetOrderByUser = (req, res, next) => {
     }
   });
 };
+
 const GetOrderAll = (req, res, next) => {
   const page = req.params.page || 1;
   const limit = req.params.limit || 5;
@@ -556,6 +556,115 @@ const UpdateStatusOrder = (req, res, next) => {
   });
 };
 
+const GetEmployees = (req, res, next) => {
+  const page = req.params.page || 1;
+  const limit = req.params.limit || 5;
+  const offset = (page - 1) * limit;
+
+  let sql = `select * from Employees limit ? ,? `;
+  connection.query(sql, [offset, limit], (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      connection.query(
+        "select count(*) as total  from Employees",
+        (TotalError, TotalResult) => {
+          if (TotalError) {
+            console.log(TotalError);
+            return res.status(500).json({
+              error: "An Unknown error.",
+            });
+          } else {
+            const total = TotalResult[0].total;
+            const totalPages = Math.ceil(total / limit);
+            res.status(200).json({
+              message: "Successful",
+              total,
+              totalPages,
+              data: result,
+            });
+          }
+        }
+      );
+    }
+  });
+};
+const AddEmployees = (req, res, next) => {
+  const { name, email, phone_number, position } = req.body;
+  console.log(name);
+
+  if (!name || !email || !phone_number || !position) {
+    return res.status(400).json({
+      error: "Missing required values !!!",
+    });
+  }
+
+  const sql = `insert into Employees (employee_name, employee_email, phone_number, position, created_date)
+               values (?, ?, ?, ?, NOW())`;
+  connection.query(
+    sql,
+    [name, email, phone_number, position],
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({
+          error: "An Unknown error .",
+        });
+      } else {
+        return res.status(200).json({
+          message: "Add employee successful.",
+        });
+      }
+    }
+  );
+};
+const DeleteEmployee = (req, res, next) => {
+  const { id } = req.body;
+
+  const sql = `delete from Employees where employee_id  = ?`;
+  connection.query(sql, [id], (error, result) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Deleted employee successful.",
+      });
+    }
+  });
+};
+const UpdateEmployee = (req, res, next) => {
+  const { id, name, email, phone_number, position } = req.body;
+
+  const updateValues = {
+    employee_name: name,
+    employee_email: email,
+    phone_number: phone_number,
+    position: position,
+    update_date: new Date(),
+  };
+
+  const sql = `update Employees set ? where employee_id = ? `;
+  connection.query(sql, [updateValues, id], (error, result) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "An Unknown error.",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Updated employee successful.",
+      });
+    }
+  });
+};
+
+// test
 const UploadFile = (req, res, next) => {
   const id = req.body.id;
 
@@ -632,6 +741,11 @@ module.exports = {
   AddTotalSales,
 
   UpdateStatusOrder,
+
+  GetEmployees,
+  AddEmployees,
+  DeleteEmployee,
+  UpdateEmployee,
 
   UploadFile,
   GetFile,

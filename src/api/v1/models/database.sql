@@ -5,6 +5,7 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL,
     phone_number VARCHAR(10) NOT NULL,
     is_staff VARCHAR(20),
+    is_active INT(2),
     created_date DATETIME
 );
 
@@ -15,6 +16,7 @@ CREATE TABLE Products (
     image_product BLOB,
     description VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
+    is_active INT(2),
     created_date DATETIME
 );
 
@@ -59,7 +61,8 @@ CREATE TABLE Employees (
     employee_name VARCHAR(255) not null,
     employee_email VARCHAR(255),
     phone_number VARCHAR(10) not null,
-    position VARCHAR(255)
+    position VARCHAR(255),
+    created_date DATETIME
 );
 
 -- tạo bảng tokens
@@ -100,15 +103,6 @@ VALUES (1, 1, 1, 'Nguyễn Văn A', '1234567890', NOW(), 'Đang xử lý');
         (2, 2, 2, 'Trần Thị B', '0987654321', NOW(), 'Hoàn thành'),
         (3, 3, 3, 'Lê Văn C', '0123456789', NOW(), 'Chờ giao hàng');
 
-
--- Thêm dữ liệu vào bảng OrderDetails
-INSERT INTO OrderDetails (id, order_id, product_id, quantity, price)
-VALUES
-    (1, 1, 1, 2, 10.99),
-    (2, 1, 3, 1, 5.99),
-    (3, 2, 2, 3, 15.49),
-    (4, 3, 4, 2, 7.89),
-    (5, 4, 5, 1, 12.99);
 
 -- Thêm dữ liệu vào bảng Cart
 INSERT INTO Cart (cart_id, user_id, product_id, quantity)

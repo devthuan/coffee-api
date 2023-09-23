@@ -8,7 +8,7 @@ const useRoutes = require("./api/v1/routes/auth.route");
 const app = express();
 dotenv.config();
 
-const port = 5050;
+const port = process.env.PORT_SERVER_AUTH || 5050;
 app.use(
   cors({
     origin: `http://localhost:3000`,

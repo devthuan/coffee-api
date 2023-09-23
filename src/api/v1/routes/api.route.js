@@ -53,6 +53,12 @@ route.patch(
   projectRouteAdmin,
   apiController.UpdateStatusOrder
 );
+
+route.get("/employees", apiController.GetEmployees);
+route.post("/employees", apiController.AddEmployees);
+route.delete("/employees", apiController.DeleteEmployee);
+route.put("/employees", apiController.UpdateEmployee);
+
 route.post("/upload", upload.single("file"), apiController.UploadFile);
 route.get("/file", apiController.GetFile);
 
