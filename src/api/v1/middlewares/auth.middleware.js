@@ -4,7 +4,7 @@
 
 // check login, token
 require("dotenv").config;
-const { connection } = require("../../../config/mysql.config");
+const { connection } = require("../../../config/db.config");
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {

@@ -1,65 +1,32 @@
 const express = require("express");
-const apiController = require("../controllers/api.controller");
-const {
-  verifyToken,
-  projectRouteAdmin,
-} = require("../middlewares/auth.middleware");
-const route = express.Router();
-const multer = require("multer");
 
-// Khởi tạo Multer và cấu hình thư mục lưu trữ tệp
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Thư mục lưu trữ tệp
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // Tên tệp sau khi lưu
-  },
-});
+const cartRoute = require("./cart.route");
+const employeeRoute = require("./employee.route");
+const orderRoute = require("./order.route");
+const productRoute = require("./product.route");
+const userRoute = require("./user.route");
+const salesRoute = require("./sales.route");
 
-const upload = multer({ storage: storage });
+const apiRoute = express();
 
-// route.get("/users", verifyToken, apiController.HomePages);
-route.post("/register", apiController.Register);
-route.get("/user", projectRouteAdmin, apiController.GetUsers);
-route.patch("/user/:id", projectRouteAdmin, apiController.DeleteUsers);
+apiRoute.use("/cart", cartRoute);
+apiRoute.use("/employees", employeeRoute);
+apiRoute.use("/", orderRoute);
+apiRoute.use("/product", productRoute);
+apiRoute.use("/", userRoute);
+apiRoute.use("/", salesRoute);
 
-route.get("/product", apiController.Products);
-route.post(
-  "/product",
-  upload.single("image_product"),
-  projectRouteAdmin,
-  apiController.AddProducts
-);
-route.patch(
-  "/product/:product_id",
-  projectRouteAdmin,
-  apiController.DeleteProducts
-);
+module.exports = apiRoute;
 
-route.get("/cart", verifyToken, apiController.GetCart);
-route.post("/cart", verifyToken, apiController.AddCart);
-route.delete("/cart/:cart_id", verifyToken, apiController.DeleteCart);
-route.patch("/cart/:cart_id", verifyToken, apiController.UpdateCart);
+// const apiController = require("../controllers/api.controller");
+// const {
+//   verifyToken,
+//   projectRouteAdmin,
+// } = require("../middlewares/auth.middleware");
+// const route = express.Router();
+// const multer = require("multer");
 
-route.get("/order", verifyToken, apiController.GetOrderByUser);
-route.get("/order-all", projectRouteAdmin, apiController.GetOrderAll);
+// route.post("/upload", upload.single("file"), apiController.UploadFile);
+// route.get("/file", apiController.GetFile);
 
-route.get("/search", projectRouteAdmin, apiController.SearchUser);
-route.post("/total-sales", projectRouteAdmin, apiController.AddTotalSales);
-
-route.patch(
-  "/status-order",
-  projectRouteAdmin,
-  apiController.UpdateStatusOrder
-);
-
-route.get("/employees", apiController.GetEmployees);
-route.post("/employees", apiController.AddEmployees);
-route.delete("/employees", apiController.DeleteEmployee);
-route.put("/employees", apiController.UpdateEmployee);
-
-route.post("/upload", upload.single("file"), apiController.UploadFile);
-route.get("/file", apiController.GetFile);
-
-module.exports = route;
+// module.exports = route;

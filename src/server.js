@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 
-const useRoutes = require("./api/v1/routes/api.route");
+const initRoute = require("./api/v1/routes/api.route");
 
 const app = express();
 dotenv.config();
@@ -31,7 +31,7 @@ app.use(helmet());
 // record logs
 app.use(morgan("combined"));
 // init routes
-app.use("/v1/", useRoutes);
+app.use("/v1/", initRoute);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
