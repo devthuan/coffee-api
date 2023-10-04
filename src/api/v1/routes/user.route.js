@@ -4,11 +4,21 @@ const {
   verifyToken,
   projectRouteAdmin,
 } = require("../middlewares/auth.middleware");
+const {
+  cacheMiddleware,
+  cacheDataUsers,
+} = require("../middlewares/cache.middleware");
+
 const route = express.Router();
 
 route.post("/register", UserController.Register);
-route.get("/user", projectRouteAdmin, UserController.GetUsers);
+route.get("/user", projectRouteAdmin, cacheDataUsers, UserController.GetUsers);
 route.patch("/user/:id", projectRouteAdmin, UserController.DeleteUsers);
-route.get("/search", projectRouteAdmin, UserController.SearchUser);
+route.get(
+  "/search",
+  projectRouteAdmin, // protected route
+  cacheMiddleware, // caching data
+  UserController.SearchUser
+);
 
 module.exports = route;

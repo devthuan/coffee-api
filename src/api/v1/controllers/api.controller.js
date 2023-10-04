@@ -1,5 +1,7 @@
 const { connection } = require("../../../config/db.config");
 
+const { redis } = require("../../../config/redis.config");
+
 const HomePages = async (req, res, next) => {
   try {
     const user_id = req.user_id;
@@ -77,9 +79,13 @@ const GetFile = (req, res, next) => {
   });
 };
 
+const GetRedis = async (req, res, next) => {};
+
 module.exports = {
   HomePages,
 
   UploadFile,
   GetFile,
+
+  GetRedis,
 };

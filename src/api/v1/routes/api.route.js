@@ -6,6 +6,7 @@ const orderRoute = require("./order.route");
 const productRoute = require("./product.route");
 const userRoute = require("./user.route");
 const salesRoute = require("./sales.route");
+const testRoute = require("./test.route");
 
 const apiRoute = express();
 
@@ -15,6 +16,7 @@ apiRoute.use("/", orderRoute);
 apiRoute.use("/product", productRoute);
 apiRoute.use("/", userRoute);
 apiRoute.use("/", salesRoute);
+apiRoute.use("/", testRoute);
 
 module.exports = apiRoute;
 

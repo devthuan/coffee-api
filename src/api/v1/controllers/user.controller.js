@@ -1,3 +1,4 @@
+require("dotenv").config();
 const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { validateRegisterData } = require("../validations/index.validation");
@@ -7,6 +8,7 @@ const {
   generateTokens,
   updateRefreshToken,
 } = require("../middlewares/auth.middleware");
+const { redis } = require("../../../config/redis.config");
 
 const Register = async (req, res, next) => {
   try {
@@ -100,6 +102,7 @@ const Login = (req, res, next) => {
         // create jwt
         const tokens = generateTokens(payload);
 
+        // update freshToken token in mysql and redis
         updateRefreshToken(result[0].id, tokens.refreshToken);
 
         res.json({
@@ -131,17 +134,30 @@ const refreshLogin = (req, res, next) => {
   if (!refreshToken) return res.status(401).json({ error: "Unauthorized" });
   try {
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    const payload = {
-      user_id: decoded.user_id,
-      username: decoded.username,
-    };
 
-    const tokens = generateTokens(payload);
-
-    updateRefreshToken(decoded.user_id, tokens.refreshToken);
-
-    res.status(200).json({
-      tokens: tokens,
+    redis.get(decoded.user_id, (error, reply) => {
+      if (error || !reply) {
+        res.json({
+          error: "Token is expired.",
+        });
+      } else {
+        if (reply === refreshToken) {
+          const payload = {
+            user_id: decoded.user_id,
+            username: decoded.username,
+          };
+          const tokens = generateTokens(payload);
+          console.log(tokens);
+          updateRefreshToken(decoded.user_id, `${tokens.refreshToken}`);
+          res.status(200).json({
+            tokens: tokens,
+          });
+        } else {
+          res.json({
+            error: "Token is expired.",
+          });
+        }
+      }
     });
   } catch (error) {
     console.log(error);
@@ -162,24 +178,34 @@ const GetUsers = (req, res, next) => {
         error: "An Unknown error.",
       });
     } else {
-      connection.query(
-        "select count(*) as total from Users",
-        (totalError, totalResult) => {
-          if (totalError) {
-            console.log(totalError);
-            res.status(500).json({ error: "An Unknown error ." });
-          } else {
-            let total = totalResult[0].total;
-            let totalPages = Math.ceil(total / limit);
-            res.status(200).json({
-              message: "Get users successful .",
-              total,
-              totalPages,
-              data: result,
-            });
-          }
+      userModel.getUserTotalPage((totalError, totalResult) => {
+        if (totalError) {
+          console.log(totalError);
+          res.status(500).json({ error: "An Unknown error ." });
+        } else {
+          let total = totalResult[0].total;
+          let totalPages = Math.ceil(total / limit);
+          res.status(200).json({
+            message: "Get users successful .",
+            total,
+            totalPages,
+            data: result,
+          });
+          const userData = {
+            message: "Get users successful .",
+            total,
+            totalPages,
+            data: result,
+          };
+          const userDataJSON = JSON.stringify(userData);
+          redis.set(
+            "users",
+            userDataJSON,
+            "EX",
+            process.env.EXPIRE_REFRESH_TOKEN
+          );
         }
-      );
+      });
     }
   });
 };

@@ -1,4 +1,6 @@
-// Trong thư mục "services":
+// Trong thư mục "services"
+// Services là thành phần chứa logic kinh doanh chính của ứng dụng. Chúng chứa các hàm thực hiện các tác vụ như xử lý dữ liệu, thêm, sửa, xóa, hoặc truy vấn cơ sở dữ liệu.
+// Services có thể gọi model để tương tác trực tiếp với cơ sở dữ liệu để lấy hoặc cập nhật thông tin.:
 // Hàm xử lý logic nghiệp vụ cụ thể cho ứng dụng, ví dụ: đăng nhập, thanh toán, tạo tài khoản người dùng, v.v.
 // Hàm tiện ích để thực hiện các tác vụ chung cho ứng dụng, ví dụ: mã hoá mật khẩu, gửi email, xử lý thanh toán, v.v.
 

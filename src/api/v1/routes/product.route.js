@@ -5,6 +5,8 @@ const {
   verifyToken,
   projectRouteAdmin,
 } = require("../middlewares/auth.middleware");
+const { cacheMiddleware } = require("../middlewares/cache.middleware");
+
 const route = express.Router();
 
 // Khởi tạo Multer và cấu hình thư mục lưu trữ tệp

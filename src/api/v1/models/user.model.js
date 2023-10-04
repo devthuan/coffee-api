@@ -1,3 +1,7 @@
+// phần model thường đảm nhiệm việc tạo và quản lý cơ sở dữ liệu bằng SQL.
+//  Một trong những công việc quan trọng của model là định nghĩa cấu trúc của
+//  các bảng cơ sở dữ liệu và thực hiện các truy vấn SQL để tạo, cập nhật, xóa, và truy vấn dữ liệu trong cơ sở dữ liệu.
+
 const { connection } = require("../../../config/db.config");
 
 const AddUserToDatabase = (
@@ -47,6 +51,17 @@ const GetUser = (page, limit, callback) => {
   });
 };
 
+const getUserTotalPage = (callback) => {
+  let sql = "select count(*) as total from Users";
+  connection.query(sql, (error, result) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, result);
+    }
+  });
+};
+
 const DeleteUsers = (id, callback) => {
   let sql = "update Users set is_active = ? where id = ?";
   connection.query(sql, [0, id], (error, result) => {
@@ -76,6 +91,7 @@ module.exports = {
   AddUserToDatabase,
   Login,
   GetUser,
+  getUserTotalPage,
   DeleteUsers,
   SearchUser,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const UserController = require("../controllers/user.controller");
 const { verifyToken } = require("../middlewares/auth.middleware");
+const { cacheMiddleware } = require("../middlewares/cache.middleware");
 const route = express.Router();
 
 route.post("/login", UserController.Login);

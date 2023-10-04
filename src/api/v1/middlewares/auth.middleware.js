@@ -5,6 +5,7 @@
 // check login, token
 require("dotenv").config;
 const { connection } = require("../../../config/db.config");
+const { redis } = require("../../../config/redis.config");
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
@@ -88,6 +89,12 @@ const updateRefreshToken = (user_id, refreshToken) => {
               console.log(error);
               return;
             } else {
+              redis.set(
+                user_id,
+                refreshToken,
+                "EX",
+                process.env.EXPIRE_REFRESH_TOKEN
+              );
               console.log("Insert successful.");
             }
           }
@@ -101,6 +108,12 @@ const updateRefreshToken = (user_id, refreshToken) => {
             if (error) {
               console.log(error);
             } else {
+              redis.set(
+                user_id,
+                refreshToken,
+                "EX",
+                process.env.EXPIRE_REFRESH_TOKEN
+              );
               console.log("Update successful.");
             }
           }
