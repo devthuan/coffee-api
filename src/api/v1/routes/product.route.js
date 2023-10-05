@@ -5,7 +5,7 @@ const {
   verifyToken,
   projectRouteAdmin,
 } = require("../middlewares/auth.middleware");
-const { cacheMiddleware } = require("../middlewares/cache.middleware");
+const { cacheDataProduct } = require("../middlewares/cache.middleware");
 
 const route = express.Router();
 
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-route.get("/", ProductController.Products);
+route.get("/", cacheDataProduct, ProductController.Products);
 
 route.post(
   "/",

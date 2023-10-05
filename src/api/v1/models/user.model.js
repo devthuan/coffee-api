@@ -3,6 +3,7 @@
 //  các bảng cơ sở dữ liệu và thực hiện các truy vấn SQL để tạo, cập nhật, xóa, và truy vấn dữ liệu trong cơ sở dữ liệu.
 
 const { connection } = require("../../../config/db.config");
+const { setDataIntoRedis } = require("../services/redis.services");
 
 const AddUserToDatabase = (
   user_name,
@@ -74,6 +75,8 @@ const DeleteUsers = (id, callback) => {
 };
 
 const SearchUser = (searchTerm, callback) => {
+  const redisKey = `search:${searchTerm}`;
+
   const sql =
     "select * from Users where username like ? or phone_number like ?";
   const query = [`${searchTerm}%`, `%${searchTerm}%`];
@@ -83,6 +86,7 @@ const SearchUser = (searchTerm, callback) => {
       callback(error, null);
     } else {
       callback(null, result);
+      setDataIntoRedis(redisKey, JSON.stringify(result), 3600);
     }
   });
 };

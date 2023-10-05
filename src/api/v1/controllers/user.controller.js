@@ -9,6 +9,7 @@ const {
   updateRefreshToken,
 } = require("../middlewares/auth.middleware");
 const { redis } = require("../../../config/redis.config");
+const { setDataIntoRedis } = require("../services/redis.services");
 
 const Register = async (req, res, next) => {
   try {
@@ -197,13 +198,7 @@ const GetUsers = (req, res, next) => {
             totalPages,
             data: result,
           };
-          const userDataJSON = JSON.stringify(userData);
-          redis.set(
-            "users",
-            userDataJSON,
-            "EX",
-            process.env.EXPIRE_REFRESH_TOKEN
-          );
+          setDataIntoRedis(`users:${page}`, JSON.stringify(userData), 3600);
         }
       });
     }

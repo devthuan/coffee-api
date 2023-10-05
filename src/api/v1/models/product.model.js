@@ -1,10 +1,24 @@
 const { connection } = require("../../../config/db.config");
+const { redis } = require("../../../config/redis.config");
 
 const GetProducts = (page, limit, callback) => {
   const offset = (page - 1) * limit;
 
   let sql = "select * from Products limit ?, ?";
   connection.query(sql, [offset, limit], (error, result) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, result);
+
+      
+    }
+  });
+};
+
+const getProductTotalPage = (callback) => {
+  let sql = "select count(*) as total from Products";
+  connection.query(sql, (error, result) => {
     if (error) {
       callback(error, null);
     } else {
@@ -51,6 +65,7 @@ const DeleteProducts = (product_id, callback) => {
 
 module.exports = {
   GetProducts,
+  getProductTotalPage,
   AddProducts,
   DeleteProducts,
 };

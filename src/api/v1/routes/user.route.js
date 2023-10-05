@@ -5,7 +5,7 @@ const {
   projectRouteAdmin,
 } = require("../middlewares/auth.middleware");
 const {
-  cacheMiddleware,
+  cacheDataSearchUser,
   cacheDataUsers,
 } = require("../middlewares/cache.middleware");
 
@@ -17,7 +17,7 @@ route.patch("/user/:id", projectRouteAdmin, UserController.DeleteUsers);
 route.get(
   "/search",
   projectRouteAdmin, // protected route
-  cacheMiddleware, // caching data
+  cacheDataSearchUser, // caching data
   UserController.SearchUser
 );
 

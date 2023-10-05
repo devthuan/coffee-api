@@ -20,8 +20,10 @@ const cacheMiddleware = (req, res, next) => {
 };
 
 const cacheDataUsers = (req, res, next) => {
+  const page = req.query.page || 1;
+
   // Kiểm tra xem dữ liệu đã được lưu trong cache chưa
-  redis.get("users", (err, cachedData) => {
+  redis.get(`users:${page}`, (err, cachedData) => {
     if (err) throw err;
 
     // Nếu có dữ liệu trong cache, trả về nó
@@ -37,4 +39,49 @@ const cacheDataUsers = (req, res, next) => {
   });
 };
 
-module.exports = { cacheMiddleware, cacheDataUsers };
+const cacheDataProduct = (req, res, next) => {
+  const page = req.query.page || 1;
+
+  console.log("check page: ", page);
+
+  let cacheKey = `products:${page}`;
+  console.log("check cachkey: ", cacheKey);
+  redis.get(cacheKey, (err, cachedData) => {
+    if (err) return res.json({ error: "Unknow an error.", detail: err });
+
+    if (cachedData) {
+      res.json({
+        message: "data from redis",
+        data: JSON.parse(cachedData),
+      });
+    } else {
+      next();
+    }
+  });
+};
+
+const cacheDataSearchUser = (req, res, next) => {
+  const searchTerm = req.query.key;
+
+  let cacheKey = `search:${searchTerm}`;
+
+  redis.get(cacheKey, (err, cachedData) => {
+    if (err) return res.json({ error: "Unknow an error.", detail: err });
+
+    if (cachedData) {
+      res.json({
+        message: "data from redis",
+        data: JSON.parse(cachedData),
+      });
+    } else {
+      next();
+    }
+  });
+};
+
+module.exports = {
+  cacheMiddleware,
+  cacheDataUsers,
+  cacheDataProduct,
+  cacheDataSearchUser,
+};

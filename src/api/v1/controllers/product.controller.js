@@ -1,4 +1,5 @@
 const productModel = require("../models/product.model");
+const { setDataIntoRedis } = require("../services/redis.services");
 
 const Products = (req, res, next) => {
   const page = req.query.page || 1;
@@ -11,26 +12,33 @@ const Products = (req, res, next) => {
         error: "An Unknown error.",
       });
     } else {
-      connection.query(
-        "select count(*) as total from Products ",
-        (error, resultTotal) => {
-          if (error) {
-            console.log(error);
-            res.status(500).json({
-              error: "An Unknown error.",
-            });
-          } else {
-            const total = resultTotal[0].total;
-            const totalPages = Math.ceil(total / limit);
-            res.status(200).json({
-              message: "Get products successful.",
-              total,
-              totalPages,
-              products: result,
-            });
-          }
+      productModel.getProductTotalPage((error, resultTotal) => {
+        if (error) {
+          console.log(error);
+          res.status(500).json({
+            error: "An Unknown error.",
+          });
+        } else {
+          const total = resultTotal[0].total;
+          const totalPages = Math.ceil(total / limit);
+          res.status(200).json({
+            message: "Get products successful.",
+            total,
+            totalPages,
+            products: result,
+          });
+          let dataProducts = {
+            message: "Get products successful.",
+            total,
+            totalPages,
+            products: result,
+          };
+
+          let dataJSON = JSON.stringify(dataProducts);
+          let cacheKey = `products:${page}`;
+          setDataIntoRedis(cacheKey, dataJSON, 3600);
         }
-      );
+      });
     }
   });
 };
