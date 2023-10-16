@@ -3,7 +3,7 @@ const { setDataIntoRedis } = require("../services/redis.services");
 
 const Products = (req, res, next) => {
   const page = req.query.page || 1;
-  const limit = req.query.limit || 5;
+  const limit = req.query.limit || 10;
 
   productModel.GetProducts(page, limit, (error, result) => {
     if (error) {
@@ -25,13 +25,13 @@ const Products = (req, res, next) => {
             message: "Get products successful.",
             total,
             totalPages,
-            products: result,
+            data: result,
           });
           let dataProducts = {
             message: "Get products successful.",
             total,
             totalPages,
-            products: result,
+            data: result,
           };
 
           let dataJSON = JSON.stringify(dataProducts);
@@ -44,14 +44,14 @@ const Products = (req, res, next) => {
 };
 
 const AddProducts = (req, res, next) => {
-  const { name_product, description, price } = req.body;
+  const { name_product, category, price } = req.body;
   const image_product = req.file;
 
   productModel.AddProducts(
     name_product,
-    description,
-    price,
     image_product,
+    category,
+    price,
     (error, result) => {
       if (error) {
         console.log(error);

@@ -1,11 +1,12 @@
 -- Bảng Users
 CREATE TABLE Users (
     id INT PRIMARY KEY  AUTO_INCREMENT AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    phone_number VARCHAR(10) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(10) NOT NULL,
+    full_name VARCHAR(255) NOT NULL ,
     is_staff VARCHAR(20),
     is_active INT(2),
+    address varchar(255),
     created_date DATETIME
 );
 
@@ -14,7 +15,7 @@ CREATE TABLE Products (
     id INT PRIMARY KEY  AUTO_INCREMENT,
     name_product VARCHAR(255) NOT NULL,
     image_product BLOB,
-    description VARCHAR(255),
+    category VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
     is_active INT(2),
     created_date DATETIME
@@ -24,15 +25,23 @@ CREATE TABLE Products (
 CREATE TABLE Orders (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    cart_id int not null,
-    full_name VARCHAR(100) not null,
-    phone_number VARCHAR(10) not null,
+    full_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(10) NOT NULL,
+    delivery_address VARCHAR(255) NOT NULL,
     order_date DATETIME NOT NULL,
+    payment_methods VARCHAR(255) NOT NULL,
     order_status VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(id), -- Nếu có bảng Users
-    FOREIGN KEY (product_id) REFERENCES Products(id) -- Nếu có bảng Products
-    FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) -- Nếu có bảng Products
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+
+
+CREATE TABLE OrderDetail (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES Orders(id),
+    FOREIGN KEY (product_id) REFERENCES Products(id)
 );
 
 
@@ -41,9 +50,9 @@ CREATE TABLE Orders (
 -- Tạo bảng Giỏ hàng
 CREATE TABLE Cart (
     cart_id INT PRIMARY KEY  AUTO_INCREMENT,
-    user_id INT,
-    product_id INT,
-    quantity INT,
+    user_id INT not null,
+    product_id INT not null,
+    quantity INT not null,
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (product_id) REFERENCES Products(id)
 );
@@ -79,40 +88,28 @@ CREATE TABLE Tokens (
 
 
 -- Thêm dữ liệu vào bảng Users
-INSERT INTO Users (id, username, password, phone_number, is_staff, created_date)
-VALUES
-    (1, 'user1', 'password1', 1234567890, 'staff1', '2023-09-08'),
-    (2, 'user2', 'password2', 9876543210, 'staff2', '2023-09-08'),
-    (3, 'user3', 'password3', 5555555555, 'staff3', '2023-09-08'),
-    (4, 'user4', 'password4', 1111111111, 'staff4', '2023-09-08'),
-    (5, 'user5', 'password5', 9999999999, 'staff5', '2023-09-08');
+INSERT INTO Users (id, phone_number, password, full_name, is_staff,is_active, address, created_date)
+VALUES (1,  "0945986661", '.' , 'Trần Phước Thuận', 'staff', 1, 'Tân Phú,HCM' , '2023-09-08')
 
 -- Thêm dữ liệu vào bảng Products
-INSERT INTO Orders (user_id, cart_id, full_name, phone_number, address, order_date, order_status)
-VALUES
-    (1, 1, 'Nguyễn Văn A', '1234567890', 'Địa chỉ A', '2023-09-11 10:00:00', 'Đang xử lý'),
-    (2, 2, 'Trần Thị B', '0987654321', 'Địa chỉ B', '2023-09-11 11:30:00', 'Hoàn thành'),
-    (3, 3, 'Lê Văn C', '0123456789', 'Địa chỉ C', '2023-09-11 12:45:00', 'Chờ giao hàng'),
-    (1, 4, 'Phạm Thị D', '0987654321', 'Địa chỉ D', '2023-09-11 14:15:00', 'Đã giao hàng'),
-    (4, 5, 'Trương Văn E', '1234567890', 'Địa chỉ E', '2023-09-11 15:30:00', 'Chờ xác nhận');
+INSERT INTO Products (name_product, image_product, category, price, is_active, created_date)
+VALUES ('Cà phê sữa đen', NULL, 'cà phê', 25000, 1, '2023-10-05 08:30:00')
+
+
 
 -- Thêm dữ liệu vào bảng Orders
--- Chèn hàng đầu tiên
-INSERT INTO Orders (user_id, product_id, cart_id, full_name, phone_number, order_date, order_status)
-VALUES (1, 1, 1, 'Nguyễn Văn A', '1234567890', NOW(), 'Đang xử lý');
-        (2, 2, 2, 'Trần Thị B', '0987654321', NOW(), 'Hoàn thành'),
-        (3, 3, 3, 'Lê Văn C', '0123456789', NOW(), 'Chờ giao hàng');
+INSERT INTO Orders (user_id, full_name, phone_number, delivery_address, order_date, payment_methods, order_status)
+VALUES (1, 'John Doe', '1234567890', '123 Main St', '2023-10-07 14:30:00', 'Credit Card', 'Processing')
+   
 
+-- Thêm dữ liệu vào bảng OrderDetail
+INSERT INTO OrderDetail (order_id, product_id, quantity)
+VALUES (1, 1, 2)
 
--- Thêm dữ liệu vào bảng Cart
-INSERT INTO Cart (cart_id, user_id, product_id, quantity)
-VALUES
-    (1, 1, 2, 1),
-    (2, 2, 4, 2),
-    (3, 3, 1, 3),
-    (4, 4, 5, 1),
-    (5, 5, 3, 2);
+INSERT INTO Cart (user_id, product_id, quantity) 
+VALUES (1,1,2)
 
+    
 -- Thêm dữ liệu vào bảng Sales
 INSERT INTO Sales (sale_id, sale_date, total_sales)
 VALUES

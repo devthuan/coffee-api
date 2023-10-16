@@ -1,0 +1,65 @@
+[33mcommit b39acfc67f27cd49fdf89e1c41493feca13b77b0[m[33m ([m[1;36mHEAD -> [m[1;32mmvc[m[33m, [m[1;31morigin/mvc[m[33m)[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Wed Oct 4 12:00:33 2023 +0700
+
+    redis integration for get user and freshtoken
+
+[33mcommit 6380c132d9b0c6024e94854a6a9edde899d3fa08[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Mon Sep 25 23:52:13 2023 +0700
+
+    chỉnh sửa cấu trúc thư mục
+
+[33mcommit 5b4a23c9ad64ed5588aae88f5500297cafdd11e6[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Sat Sep 23 12:28:38 2023 +0700
+
+    crud employee
+
+[33mcommit c8e528e9c060befa6db6685bf6456b6a9e54b319[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Mon Sep 18 00:14:19 2023 +0700
+
+    create api add product, delete product, user
+
+[33mcommit da26df5e325f7f464060e8f8ee2c6c362ba9f984[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Sun Sep 17 00:55:49 2023 +0700
+
+    update upload and get file using libb multer
+
+[33mcommit c8d70ca0325977bd5e1d0af3c84a7a3fa104d663[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Wed Sep 13 12:16:52 2023 +0700
+
+    create api search by username or phone number and add data sales
+
+[33mcommit a74b39e6b9fc4dcad8d14c19dbef8e61500db18c[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Tue Sep 12 22:09:32 2023 +0700
+
+    api get orders by user and all
+
+[33mcommit 7b68af073fa1eb147929f94c6ba228cae85c4aab[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Tue Sep 12 00:03:03 2023 +0700
+
+    CURD Cart and phân trang api
+
+[33mcommit 1ae9cf089a50a1e57e496e7012d323ff5c67f2de[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Mon Sep 11 00:13:35 2023 +0700
+
+    added login, logout, registration, and jwt authentication mechanisms
+
+[33mcommit 4597af5ec9fbcc454c88645b4ee004ed4f4bb862[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Thu Sep 7 22:01:11 2023 +0700
+
+    connect mysql
+
+[33mcommit 3f313edc558edf26baa34a1b1b36b19601376e02[m
+Author: devthuan <devthuan24@gmail.com>
+Date:   Wed Sep 6 23:29:12 2023 +0700
+
+    build base project express RESTful

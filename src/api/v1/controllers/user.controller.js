@@ -13,12 +13,8 @@ const { setDataIntoRedis } = require("../services/redis.services");
 
 const Register = async (req, res, next) => {
   try {
-    const { user_name, password, phone_number } = req.body;
-    let validationErrors = validateRegisterData(
-      user_name,
-      password,
-      phone_number
-    );
+    const { full_name, phone_number, password } = req.body;
+    let validationErrors = validateRegisterData(password, phone_number);
 
     if (validationErrors) {
       return res.status(400).json({ error: validationErrors });
@@ -29,11 +25,12 @@ const Register = async (req, res, next) => {
     let hashPass = await hashPassword(password);
 
     userModel.AddUserToDatabase(
-      user_name,
-      hashPass,
       phone_number,
-      created_date,
+      hashPass,
+      full_name,
       is_staff,
+      1,
+      created_date,
       (error, result) => {
         if (error) {
           if (error.code === "ER_DUP_ENTRY") {
@@ -64,29 +61,29 @@ const Register = async (req, res, next) => {
 
 const Login = (req, res, next) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const { phone_number, password } = req.body;
+    if (!phone_number || !password) {
       return res.status(400).json({
-        error: "Username and password are required !!!",
+        error: "phone_number and password are required !!!",
       });
     }
 
-    userModel.Login(username, async (error, result, fields) => {
+    userModel.Login(phone_number, async (error, result) => {
       if (error) {
         res.status(400).json({
           error: "An Unknown error !!!",
         });
         return;
       } else {
-        if (result[0].length === 0) {
-          return res.status(404).json({
+        if (!result[0]) {
+          return res.status(401).json({
             error: "Account or password is incorrect.",
           });
         }
 
         let comparePass = await comparePassword(password, result[0].password);
         if (!comparePass) {
-          return res.status(404).json({
+          return res.status(401).json({
             error: "Account or password is incorrect.",
           });
         }
@@ -98,7 +95,7 @@ const Login = (req, res, next) => {
 
         let payload = {
           user_id: result[0].id,
-          username: username,
+          phone_number: phone_number,
         };
         // create jwt
         const tokens = generateTokens(payload);
@@ -106,7 +103,7 @@ const Login = (req, res, next) => {
         // update freshToken token in mysql and redis
         updateRefreshToken(result[0].id, tokens.refreshToken);
 
-        res.json({
+        res.status(200).json({
           message: "Login successful.",
           token: tokens,
         });
@@ -168,9 +165,10 @@ const refreshLogin = (req, res, next) => {
   }
 };
 
+
 const GetUsers = (req, res, next) => {
   const page = req.query.page || 1;
-  const limit = req.query.limit || 5;
+  const limit = req.query.limit || 10;
 
   userModel.GetUser(page, limit, (error, result) => {
     if (error) {

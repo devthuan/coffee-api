@@ -10,8 +10,6 @@ const GetProducts = (page, limit, callback) => {
       callback(error, null);
     } else {
       callback(null, result);
-
-      
     }
   });
 };
@@ -29,18 +27,19 @@ const getProductTotalPage = (callback) => {
 
 const AddProducts = (
   name_product,
-  description,
-  price,
   image_product,
+  category,
+  price,
   callback
 ) => {
   const serverUrl = "http://localhost:8080/uploads/";
   const pathFile = serverUrl + image_product.filename;
 
-  let sql = `insert into Products (name_product, description, price, created_date, image_product) values (?, ?, ?, NOW(), ?)`;
+  let sql = `INSERT INTO Products (name_product, image_product, category, price, is_active, created_date)
+              VALUES (?, ?, ?, ?, ?, NOW())`;
   connection.query(
     sql,
-    [name_product, description, price, pathFile],
+    [name_product, pathFile, category, price, 1],
     (error, result) => {
       if (error) {
         callback(error, null);

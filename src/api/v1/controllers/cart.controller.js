@@ -10,8 +10,18 @@ const GetCart = (req, res) => {
         error: "An Unknown error",
       });
     } else {
-      res.json({
-        data: result,
+      cartModel.getTotalCart((errorTotal, resultTotal) => {
+        if (errorTotal) {
+          res.status(400).json({
+            error: "An Unknown error",
+          });
+        } else {
+          const totalCart = resultTotal[0].total;
+          res.json({
+            totalCart,
+            data: result,
+          });
+        }
       });
     }
   });
@@ -62,11 +72,33 @@ const DeleteCart = (req, res) => {
     }
   });
 };
+const DeleteCartByUserId = (req, res) => {
+  const user_id = req.user_id;
+  if (!user_id) {
+    return res.status(400).json({
+      error: "Missing values.",
+    });
+  }
+
+  cartModel.DeleteCartByUserId(user_id, (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        error: "An Unknown error",
+      });
+    } else {
+      res.json({
+        message: "delete item by user id in cart successful.",
+      });
+    }
+  });
+};
 
 const UpdateCart = (req, res) => {
   const { cart_id } = req.params;
   const { quantity } = req.body;
-  if (!cart_id) {
+
+  if (!cart_id && !quantity) {
     return res.status(400).json({
       error: "Missing values.",
     });
@@ -90,5 +122,6 @@ module.exports = {
   GetCart,
   AddCart,
   DeleteCart,
+  DeleteCartByUserId,
   UpdateCart,
 };

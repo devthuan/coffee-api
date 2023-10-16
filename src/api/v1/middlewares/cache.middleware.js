@@ -28,10 +28,7 @@ const cacheDataUsers = (req, res, next) => {
 
     // Nếu có dữ liệu trong cache, trả về nó
     if (cachedData) {
-      res.json({
-        messege: "data from redis",
-        data: JSON.parse(cachedData),
-      });
+      res.json(JSON.parse(cachedData));
     } else {
       // Nếu không có dữ liệu trong cache, tiếp tục xử lý yêu cầu và lưu dữ liệu vào cache
       next();
@@ -50,10 +47,7 @@ const cacheDataProduct = (req, res, next) => {
     if (err) return res.json({ error: "Unknow an error.", detail: err });
 
     if (cachedData) {
-      res.json({
-        message: "data from redis",
-        data: JSON.parse(cachedData),
-      });
+      res.json(JSON.parse(cachedData));
     } else {
       next();
     }
@@ -69,10 +63,7 @@ const cacheDataSearchUser = (req, res, next) => {
     if (err) return res.json({ error: "Unknow an error.", detail: err });
 
     if (cachedData) {
-      res.json({
-        message: "data from redis",
-        data: JSON.parse(cachedData),
-      });
+      res.json(JSON.parse(cachedData));
     } else {
       next();
     }

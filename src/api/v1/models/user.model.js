@@ -6,17 +6,20 @@ const { connection } = require("../../../config/db.config");
 const { setDataIntoRedis } = require("../services/redis.services");
 
 const AddUserToDatabase = (
-  user_name,
-  hashPass,
   phone_number,
+  password,
+  full_name,
+  is_staff,
+  is_active,
   created_date,
-  is_staff
+  callback
 ) => {
-  let sql = `insert into Users (username, password, phone_number, created_date, is_staff ) values (?, ?, ?, ? ,?) `;
+  let sql = `insert into Users (phone_number, password, full_name, is_staff,is_active , created_date) 
+  VALUES (?, ?, ?, ?, ?, ?) `;
 
   connection.query(
     sql,
-    [user_name, hashPass, phone_number, created_date, is_staff],
+    [phone_number, password, full_name, is_staff, is_active, created_date],
     (error, result) => {
       if (error) {
         callback(error, null);
@@ -27,11 +30,11 @@ const AddUserToDatabase = (
   );
 };
 
-const Login = (username, callback) => {
+const Login = (phone_number, callback) => {
   let sql =
-    "select id, username, password, is_active from Users where username = ?";
+    "select id, phone_number, password, is_active from Users where phone_number = ?";
 
-  connection.query(sql, [username], async (error, result) => {
+  connection.query(sql, [phone_number], async (error, result) => {
     if (error) {
       callback(error, null);
     } else {
@@ -78,7 +81,7 @@ const SearchUser = (searchTerm, callback) => {
   const redisKey = `search:${searchTerm}`;
 
   const sql =
-    "select * from Users where username like ? or phone_number like ?";
+    "select * from Users where full_name like ? or phone_number like ?";
   const query = [`${searchTerm}%`, `%${searchTerm}%`];
 
   connection.query(sql, query, (error, result) => {

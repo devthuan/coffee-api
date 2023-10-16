@@ -9,6 +9,7 @@ route.get("/", verifyToken, CartController.GetCart);
 route.post("/", verifyToken, CartController.AddCart);
 
 route.delete("/:cart_id", verifyToken, CartController.DeleteCart);
+route.delete("", verifyToken, CartController.DeleteCartByUserId);
 
 route.patch("/:cart_id", verifyToken, CartController.UpdateCart);
 
