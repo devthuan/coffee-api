@@ -32,7 +32,7 @@ const AddUserToDatabase = (
 
 const Login = (phone_number, callback) => {
   let sql =
-    "select id, phone_number, password, is_active from Users where phone_number = ?";
+    "select id, phone_number, password, is_active, is_staff from Users where phone_number = ?";
 
   connection.query(sql, [phone_number], async (error, result) => {
     if (error) {
@@ -45,7 +45,8 @@ const Login = (phone_number, callback) => {
 
 const GetUser = (page, limit, callback) => {
   const offset = (page - 1) * limit;
-  let sql = "select * from Users limit ?, ?";
+  let sql =
+    "select id, phone_number, full_name, is_staff, is_active, address, created_date from Users limit ?, ?";
   connection.query(sql, [offset, limit], (error, result) => {
     if (error) {
       callback(error, null);
@@ -81,7 +82,7 @@ const SearchUser = (searchTerm, callback) => {
   const redisKey = `search:${searchTerm}`;
 
   const sql =
-    "select * from Users where full_name like ? or phone_number like ?";
+    "select id, phone_number, full_name, is_staff, is_active, address, created_date from Users where full_name like ? or phone_number like ?";
   const query = [`${searchTerm}%`, `%${searchTerm}%`];
 
   connection.query(sql, query, (error, result) => {
@@ -94,6 +95,17 @@ const SearchUser = (searchTerm, callback) => {
   });
 };
 
+const UpdateStatusAccount = (user_id, new_status, callback) => {
+  let sql = `update Users set is_active = ? where id = ?`;
+  connection.query(sql, [new_status, user_id], (error, result) => {
+    if (error) {
+      return callback(error, null);
+    } else {
+      return callback(null, result);
+    }
+  });
+};
+
 module.exports = {
   AddUserToDatabase,
   Login,
@@ -101,4 +113,5 @@ module.exports = {
   getUserTotalPage,
   DeleteUsers,
   SearchUser,
+  UpdateStatusAccount,
 };

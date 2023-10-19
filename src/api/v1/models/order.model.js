@@ -99,21 +99,6 @@ const GetOrderByUser = (user_id, callback) => {
 
 const GetOrderAll = (page, limit, callback) => {
   const offset = (page - 1) * limit;
-
-  //   let sql = `SELECT
-  // 	Orders.id,
-  //     full_name,
-  //     phone_number,
-  //     delivery_address,
-  //     order_date,
-  //     payment_methods,
-  //     order_status,
-  //     SUM(OrderDetail.quantity * Products.price) AS total_payment
-  // FROM Orders
-  // JOIN OrderDetail ON Orders.id = OrderDetail.order_id
-  // JOIN Products ON Orders.product_id = Products.id
-  // GROUP BY Orders.id, full_name, phone_number, delivery_address, order_date, payment_methods, order_status
-  // `;
   let sql = `SELECT
   	Orders.id,
       full_name,
@@ -126,7 +111,8 @@ const GetOrderAll = (page, limit, callback) => {
   FROM Orders
   JOIN OrderDetail ON Orders.id = OrderDetail.order_id
   JOIN Products ON OrderDetail.product_id = Products.id
-  GROUP BY Orders.id, full_name, phone_number, delivery_address, order_date, payment_methods, order_status`;
+  GROUP BY Orders.id, full_name, phone_number, delivery_address, order_date, payment_methods, order_status
+`;
   connection.query(sql, [offset, limit], (error, result) => {
     if (error) {
       callback(error, null);

@@ -102,9 +102,9 @@ const Login = (req, res, next) => {
 
         // update freshToken token in mysql and redis
         updateRefreshToken(result[0].id, tokens.refreshToken);
-
         res.status(200).json({
           message: "Login successful.",
+          permission: result[0].is_staff,
           token: tokens,
         });
       }
@@ -164,7 +164,6 @@ const refreshLogin = (req, res, next) => {
     });
   }
 };
-
 
 const GetUsers = (req, res, next) => {
   const page = req.query.page || 1;
@@ -244,6 +243,29 @@ const SearchUser = (req, res, next) => {
   });
 };
 
+const UpdateStatusAccount = (req, res, next) => {
+  const { user_id, new_status } = req.body;
+
+  if (!new_status && !user_id) {
+    return res.status(400).json({
+      error: "missing value!",
+    });
+  }
+
+  userModel.UpdateStatusAccount(user_id, new_status, (error, result) => {
+    if (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "Error query",
+      });
+    } else {
+      return res.status(200).json({
+        message: "Update status account successful.",
+      });
+    }
+  });
+};
+
 module.exports = {
   refreshLogin,
   Login,
@@ -253,4 +275,5 @@ module.exports = {
   GetUsers,
   DeleteUsers,
   SearchUser,
+  UpdateStatusAccount,
 };

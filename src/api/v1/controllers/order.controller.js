@@ -124,8 +124,8 @@ const GetOrderByUser = (req, res, next) => {
 };
 
 const GetOrderAll = (req, res, next) => {
-  const page = req.params.page || 1;
-  const limit = req.params.limit || 10;
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 10;
 
   orderModel.GetOrderAll(page, limit, (error, result) => {
     if (error) {
